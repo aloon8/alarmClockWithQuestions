@@ -1,27 +1,39 @@
 package com.example.myapplication;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
+import android.util.JsonReader;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.myapplication.R;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+import static com.example.myapplication.ClockDisplay.ReadFile;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
-
+    JSONObject clocks;
     Context context;
     CardView cardview;
     LayoutParams layoutparams, layoutparams1;
@@ -30,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     FloatingActionButton fabPlus, fabClock;
     Animation FabOpen, FabClose, FabRClockwisw, FabRanticlockWise;
     boolean isOpen = false;
+    static int id = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +50,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         context = getApplicationContext();
-
         linearLayout = (LinearLayout)findViewById(R.id.linearLayout);
 
         CreateCardViewProgrammatically();
@@ -63,9 +75,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
         });
+        fabClock.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), ClockDisplay.class);
+                v.getContext().startActivity(intent);
+            }
+        });
     }
 
-    public CardView createCardView() {
+
+    public CardView createCardView(JSONObject object) {
         cardview = new CardView(context);
         layoutparams = new LayoutParams(LayoutParams.MATCH_PARENT ,400);
         layoutparams.topMargin = 20;
@@ -82,7 +103,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         textview = new TextView(context);
         textview.setLayoutParams(layoutparams);
-        textview.setText("10:00");
+        try {
+            textview.setText(object.get("Hours").toString() + ":" + object.get("Minutes").toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         textview.setGravity(Gravity.CENTER_HORIZONTAL);
         textview.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 35);
         textview.setTextColor(Color.BLACK);
@@ -91,7 +116,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         layoutparams1 = new LayoutParams(LayoutParams.MATCH_PARENT ,400);
         layoutparams1.topMargin = 200;
         textview1.setLayoutParams(layoutparams1);
-        textview1.setText("Fri");
+
+        try {
+            JSONArray DaysArray = object.getJSONArray("Days");
+            for (int i = 0; i < DaysArray.length(); i++ ) {
+                Object day = DaysArray.get(i);
+                textview1.setText(day.toString() + "  ");
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         textview1.setGravity(Gravity.CENTER_HORIZONTAL);
         textview1.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 25);
         textview1.setTextColor(Color.BLACK);
@@ -100,15 +135,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void CreateCardViewProgrammatically(){
+        String fileInString = ReadFile(context);
+        System.out.println(fileInString.toString());
+        JSONObject json = null;
+        try {
+             json = new JSONObject(fileInString);
 
-        linearLayout.addView(createCardView());
-        linearLayout.addView(createCardView());
-        linearLayout.addView(createCardView());
-        linearLayout.addView(createCardView());
-        linearLayout.addView(createCardView());
-        linearLayout.addView(createCardView());
-        linearLayout.addView(createCardView());
-        linearLayout.addView(createCardView());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    
+        for (int i = 0; i < json.length(); i++) {
+
+            try {
+                JSONObject object = json.getJSONObject("clock" + i);
+                linearLayout.addView(createCardView(object));
+            } catch (JSONException e) {
+                continue;
+            }
+        }
 
 
     }
@@ -118,7 +163,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId()) {
             case 1 : Toast.makeText(this, "CardView 1" , Toast.LENGTH_SHORT).show(); break;
             case 2 : Toast.makeText(this, "CardView 2" , Toast.LENGTH_SHORT).show(); break;
-            case 3 : Toast.makeText(this, "CardView 3" , Toast.LENGTH_SHORT).show(); break;
         }
 
     }
