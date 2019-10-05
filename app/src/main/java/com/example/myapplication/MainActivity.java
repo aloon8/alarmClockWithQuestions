@@ -30,6 +30,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import static com.example.myapplication.ClockDisplay.CreateFile;
 import static com.example.myapplication.ClockDisplay.ReadFile;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
@@ -48,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+//        CreateFile(this);
         context = getApplicationContext();
         linearLayout = (LinearLayout)findViewById(R.id.linearLayout);
 
@@ -118,10 +119,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         textview1.setLayoutParams(layoutparams1);
 
         try {
-            JSONArray DaysArray = object.getJSONArray("Days");
+            JSONArray DaysArray = object.getJSONArray("key");
             for (int i = 0; i < DaysArray.length(); i++ ) {
                 Object day = DaysArray.get(i);
-                textview1.setText(day.toString() + "  ");
+                textview1.append(day.toString() + " ");
             }
 
         } catch (JSONException e) {

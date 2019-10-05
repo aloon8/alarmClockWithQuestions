@@ -25,12 +25,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.Calendar;
-import java.text.SimpleDateFormat;
-import java.util.GregorianCalendar;
-import java.util.Arrays;
+
 
 public class ClockDisplay extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener {
 
@@ -167,7 +162,7 @@ public class ClockDisplay extends AppCompatActivity implements PopupMenu.OnMenuI
     }
 
 
-    void CreateFile(Context context) {
+    static void CreateFile(Context context) {
         String filename = "storage.json";
         String path = context.getFilesDir().getAbsolutePath() + "/" + filename;
         File file = new File(path);
@@ -207,9 +202,13 @@ public class ClockDisplay extends AppCompatActivity implements PopupMenu.OnMenuI
             clock1.put("Minutes", myclock.Minites);
             clock1.put("ampm", myclock.AMPM);
             clock1.put("Difficult", myclock.Difficult);
-            JSONArray Days = new JSONArray(myclock.Days);
-            System.out.println(Days.toString());
-            clock1.put("Days", Days);
+            JSONArray myJSONArray = new JSONArray();
+            JSONObject obj = new JSONObject();
+            JSONArray array = new JSONArray();
+            for (String day:myclock.Days) {
+                array.put(day);
+            }
+            clock1.put("key", array);
 
         } catch (JSONException e) {
             // TODO Auto-generated catch block
