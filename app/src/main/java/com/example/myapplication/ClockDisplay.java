@@ -34,13 +34,13 @@ public class ClockDisplay extends AppCompatActivity implements PopupMenu.OnMenuI
 
     TimePicker alarmTime;
     TextClock  currentTime;
-    Button B;
+    Button B,B2;
     ClockA myclock;
     JSONObject clocks;
     int id;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_clock_display);
         Intent intent = getIntent();
@@ -49,8 +49,15 @@ public class ClockDisplay extends AppCompatActivity implements PopupMenu.OnMenuI
         alarmTime = findViewById(R.id.TimePicker);
         currentTime = findViewById(R.id.TextClock);
         B = findViewById(R.id.button);
+//        B2 = findViewById(R.id.button2);
         myclock = new ClockA();
-
+//        B2.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                DaysDialog d = new DaysDialog();
+//                d.getShowsDialog();
+//            }
+//        });
         B.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
