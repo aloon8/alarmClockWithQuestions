@@ -121,8 +121,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public CardView createCardView(JSONObject object) {
         cardview = new CardView(context);
-        LinearLayout.LayoutParams buttonLayoutParams = new LayoutParams(50, 50);
-        buttonLayoutParams.gravity = Gravity.RIGHT;
+        LinearLayout.LayoutParams buttonLayoutParams = new LayoutParams(100, 100);
+        buttonLayoutParams.leftMargin = 920;
+        buttonLayoutParams.topMargin = 10;
         layoutparams = new LayoutParams(LayoutParams.MATCH_PARENT ,400);
         layoutparams.topMargin = 50;
         layoutparams.leftMargin = 20;
@@ -142,6 +143,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ImageButton imgButton = new ImageButton(context);
         imgButton.setImageResource(R.drawable.closebutton);
         imgButton.setLayoutParams(buttonLayoutParams);
+        try {
+            imgButton.setId((int)object.get("id"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        imgButton.setOnClickListener(this);
         cardview.addView(imgButton);
         textview = new TextView(context);
         textview.setLayoutParams(layoutparams);
@@ -227,11 +234,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        DeleteJsonObject(context, v.getId());
-        linearLayout.removeView(v);
-        Intent i = new Intent(this, MyAlarm.class);
-        //creating a pending intent using the intent
-        PendingIntent.getBroadcast(this, v.getId(), i, 0).cancel();
-
+        if (v instanceof ImageButton) {
+            System.out.println("id: " + v.getId());
+            DeleteJsonObject(context, v.getId());
+            linearLayout.removeView(findViewById(v.getId()));
+            Intent i = new Intent(this, MyAlarm.class);
+            //creating a pending intent using the intent
+            PendingIntent.getBroadcast(this, v.getId(), i, 0).cancel();
+            // do what you want with imageView
+        }
     }
 }

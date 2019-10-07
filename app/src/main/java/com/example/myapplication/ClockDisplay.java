@@ -277,5 +277,9 @@ public class ClockDisplay extends AppCompatActivity implements PopupMenu.OnMenuI
             e.printStackTrace();
         }
     }
+
+    static void EditJsonObject(Context context, int id) {
+
+    }
 }
 
