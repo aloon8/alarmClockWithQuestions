@@ -29,9 +29,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Calendar;
 
-import static com.example.myapplication.MainActivity.alarmManagerMap;
-import static com.example.myapplication.MainActivity.pendingIntentMap;
-
 
 public class ClockDisplay extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener {
 
@@ -97,8 +94,8 @@ public class ClockDisplay extends AppCompatActivity implements PopupMenu.OnMenuI
 
         //setting the repeating alarm that will be fired every day
         am.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pi);
-        alarmManagerMap.put(id, am);
-        pendingIntentMap.put(id, pi);
+//        alarmManagerMap.put(id, am);
+//        pendingIntentMap.put(id, pi);
         Toast.makeText(this, "Alarm is set", Toast.LENGTH_SHORT).show();
     }
 
@@ -121,31 +118,31 @@ public class ClockDisplay extends AppCompatActivity implements PopupMenu.OnMenuI
         switch (item.getItemId()){
             case R.id.sunday:
                 Toast.makeText(this,"Sunday",Toast.LENGTH_SHORT).show();
-                myclock.setDays("Sunday");
+                myclock.setDays("Sun");
                 return true;
             case R.id.monday:
                 Toast.makeText(this,"Monday",Toast.LENGTH_SHORT).show();
-                myclock.setDays("Monday");
+                myclock.setDays("Mon");
                 return true;
             case R.id.tuesday:
                 Toast.makeText(this,"Tuesday",Toast.LENGTH_SHORT).show();
-                myclock.setDays("Tuesday");
+                myclock.setDays("Tue");
                 return true;
             case R.id.wednesday:
                 Toast.makeText(this,"Wednesday",Toast.LENGTH_SHORT).show();
-                myclock.setDays("Wednesday");
+                myclock.setDays("Wed");
                 return true;
             case R.id.thursday:
                 Toast.makeText(this,"Thursday",Toast.LENGTH_SHORT).show();
-                myclock.setDays("Thursday");
+                myclock.setDays("Thu");
                 return true;
             case R.id.friday:
                 Toast.makeText(this,"Friday",Toast.LENGTH_SHORT).show();
-                myclock.setDays("Friday");
+                myclock.setDays("Fri");
                 return true;
             case R.id.saturday:
                 Toast.makeText(this,"Saturday",Toast.LENGTH_SHORT).show();
-                myclock.setDays("Saturday");
+                myclock.setDays("Sat");
                 return true;
             case R.id.easy:
                 Toast.makeText(this,"Easy",Toast.LENGTH_SHORT).show();

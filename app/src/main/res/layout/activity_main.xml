@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_height="match_parent"
     android:layout_width="match_parent"
-    android:background="@drawable/sky_background"
+    android:background="@drawable/wakeup"
     tools:context="com.example.myapplication.MainActivity">
 
     <ScrollView
@@ -27,20 +27,21 @@
     android:layout_gravity="end|bottom"
     android:src="@drawable/ic_action_clock"
     android:layout_marginBottom="100dp"
+    android:layout_marginRight="20dp"
     android:elevation="6dp"
     android:id="@+id/fab_clock"
     app:pressedTranslationZ="12dp"
-    android:visibility="invisible"
-
-        />
+    android:visibility="invisible" />
 
     <android.support.design.widget.FloatingActionButton
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:layout_marginRight="20dp"
     android:layout_gravity="end|bottom"
     android:src="@drawable/ic_action_plus"
     android:layout_marginBottom="16dp"
     android:elevation="6dp"
     android:id="@+id/fab_plus"
     app:pressedTranslationZ="12dp"/>
+
 </android.support.design.widget.CoordinatorLayout>

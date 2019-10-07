@@ -6,20 +6,26 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
+import android.text.Layout;
 import android.util.JsonReader;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,8 +48,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     LinearLayout linearLayout;
     FloatingActionButton fabPlus, fabClock;
     Animation FabOpen, FabClose, FabRClockwisw, FabRanticlockWise;
-    static Map<Integer, AlarmManager> alarmManagerMap   = new HashMap<Integer, AlarmManager>();
-    static Map<Integer, PendingIntent> pendingIntentMap = new HashMap<Integer, PendingIntent>();
+//    static Map<Integer, AlarmManager> alarmManagerMap   = new HashMap<Integer, AlarmManager>();
+//    static Map<Integer, PendingIntent> pendingIntentMap = new HashMap<Integer, PendingIntent>();
 
     boolean isOpen = false;
     static int id;
@@ -115,8 +121,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public CardView createCardView(JSONObject object) {
         cardview = new CardView(context);
+        LinearLayout.LayoutParams buttonLayoutParams = new LayoutParams(50, 50);
+        buttonLayoutParams.gravity = Gravity.RIGHT;
         layoutparams = new LayoutParams(LayoutParams.MATCH_PARENT ,400);
-        layoutparams.topMargin = 20;
+        layoutparams.topMargin = 50;
         layoutparams.leftMargin = 20;
         layoutparams.rightMargin = 20;
         cardview.setLayoutParams(layoutparams);
@@ -131,7 +139,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             e.printStackTrace();
         }
         cardview.setOnClickListener(this);
-
+        ImageButton imgButton = new ImageButton(context);
+        imgButton.setImageResource(R.drawable.closebutton);
+        imgButton.setLayoutParams(buttonLayoutParams);
+        cardview.addView(imgButton);
         textview = new TextView(context);
         textview.setLayoutParams(layoutparams);
         textview.setText(GetAlarmTimeString(object));
@@ -146,6 +157,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         try {
             JSONArray DaysArray = object.getJSONArray("key");
+            if (DaysArray.length() == 0) {
+                textview1.append("Every Day");
+            }
             for (int i = 0; i < DaysArray.length(); i++ ) {
                 Object day = DaysArray.get(i);
                 textview1.append(day.toString() + " ");
@@ -189,19 +203,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        String AlarmTimestring;
+        String AlarmTimestring = null;
         String minutes;
         if (alarmMinites < 10) {
             minutes = "0" + alarmMinites.toString();
         } else {
             minutes = alarmMinites.toString();
         }
-        if(alarmHours > 12) {
-            alarmHours = alarmHours - 12;
-            AlarmTimestring = alarmHours.toString().concat(":").concat(minutes).concat(" PM");
-        }
-        else{
-            AlarmTimestring = alarmHours.toString().concat(":").concat(minutes).concat(" AM");
+        try {
+            if(jsonObject.get("ampm").toString().equals("PM")) {
+                alarmHours = alarmHours + 12;
+                AlarmTimestring = alarmHours.toString().concat(":").concat(minutes);
+            }
+            else{
+                AlarmTimestring = alarmHours.toString().concat(":").concat(minutes);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
         return AlarmTimestring;
 
@@ -211,8 +229,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         DeleteJsonObject(context, v.getId());
         linearLayout.removeView(v);
-        alarmManagerMap.get(v.getId()).cancel(pendingIntentMap.get(v.getId()));
-        pendingIntentMap.remove(v.getId());
-        alarmManagerMap.remove(v.getId());
+        Intent i = new Intent(this, MyAlarm.class);
+        //creating a pending intent using the intent
+        PendingIntent.getBroadcast(this, v.getId(), i, 0).cancel();
+
     }
 }
