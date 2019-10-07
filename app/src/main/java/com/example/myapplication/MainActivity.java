@@ -25,7 +25,6 @@ import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONException;
