@@ -1,7 +1,10 @@
 package com.example.myapplication;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -22,19 +25,16 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.example.myapplication.ClockDisplay.CreateFile;
+import static com.example.myapplication.ClockDisplay.DeleteJsonObject;
 import static com.example.myapplication.ClockDisplay.ReadFile;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
-    JSONObject clocks;
     Context context;
     CardView cardview;
     LayoutParams layoutparams, layoutparams1;
@@ -42,13 +42,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     LinearLayout linearLayout;
     FloatingActionButton fabPlus, fabClock;
     Animation FabOpen, FabClose, FabRClockwisw, FabRanticlockWise;
+    static Map<Integer, AlarmManager> alarmManagerMap   = new HashMap<Integer, AlarmManager>();
+    static Map<Integer, PendingIntent> pendingIntentMap = new HashMap<Integer, PendingIntent>();
+
     boolean isOpen = false;
+    static int id;
+    public static final String PREFS_NAME = "MyPrefsFile";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//        CreateFile(this);
+//        File dir = getFilesDir();
+//        File file = new File(dir, "storage.json");
+//        boolean deleted = file.delete();
+
+        //Read value of id before the app was closed
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+        id = settings.getInt("id", 0);
+        CreateFile(this);
         context = getApplicationContext();
         linearLayout = (LinearLayout)findViewById(R.id.linearLayout);
 
@@ -80,9 +92,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), ClockDisplay.class);
+                intent.putExtra("id", id++);
                 v.getContext().startActivity(intent);
             }
         });
+    }
+
+    @Override
+    protected void onStop(){
+        super.onStop();
+
+        // We need an Editor object to make preference changes.
+        // All objects are from android.context.Context
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putInt("id", id);
+
+        // Commit the edits!
+        editor.commit();
     }
 
 
@@ -98,7 +125,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         cardview.setCardBackgroundColor(Color.GRAY);
         cardview.setMaxCardElevation(30);
         cardview.getBackground().setAlpha(128);
-        cardview.setId(View.generateViewId());
+        try {
+            cardview.setId((int)object.get("id"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         cardview.setOnClickListener(this);
 
         textview = new TextView(context);
@@ -132,7 +163,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void CreateCardViewProgrammatically(){
         String fileInString = ReadFile(context);
-        System.out.println(fileInString.toString());
         JSONObject json = null;
         try {
              json = new JSONObject(fileInString);
@@ -140,8 +170,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } catch (JSONException e) {
             e.printStackTrace();
         }
-    
-        for (int i = 0; i < json.length(); i++) {
+        for (int i = 0; i < id; i++) {
             try {
                 JSONObject object = json.getJSONObject("clock" + i);
                 linearLayout.addView(createCardView(object));
@@ -180,10 +209,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case 1 : Toast.makeText(this, "CardView 1" , Toast.LENGTH_SHORT).show(); break;
-            case 2 : Toast.makeText(this, "CardView 2" , Toast.LENGTH_SHORT).show(); break;
-        }
-
+        DeleteJsonObject(context, v.getId());
+        linearLayout.removeView(v);
+        alarmManagerMap.get(v.getId()).cancel(pendingIntentMap.get(v.getId()));
+        pendingIntentMap.remove(v.getId());
+        alarmManagerMap.remove(v.getId());
     }
 }

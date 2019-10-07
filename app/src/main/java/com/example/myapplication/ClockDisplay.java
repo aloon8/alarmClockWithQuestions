@@ -29,6 +29,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Calendar;
 
+import static com.example.myapplication.MainActivity.alarmManagerMap;
+import static com.example.myapplication.MainActivity.pendingIntentMap;
+
 
 public class ClockDisplay extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener {
 
@@ -37,19 +40,19 @@ public class ClockDisplay extends AppCompatActivity implements PopupMenu.OnMenuI
     Button B;
     ClockA myclock;
     JSONObject clocks;
-    static int id = 0;
+    int id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        System.out.println("IMMMMMMMM HEREEEEEE");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_clock_display);
-
+        Intent intent = getIntent();
+        id = intent.getIntExtra("id", 0);
+        System.out.println("id: " + id);
         alarmTime = findViewById(R.id.TimePicker);
         currentTime = findViewById(R.id.TextClock);
         B = findViewById(R.id.button);
         myclock = new ClockA();
-        final Ringtone r = RingtoneManager.getRingtone(getApplicationContext() , RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE));
 
         B.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,8 +67,8 @@ public class ClockDisplay extends AppCompatActivity implements PopupMenu.OnMenuI
                 }
                 System.out.println("immmm heeererereree");
                 CreateFile(v.getContext());
-                WriteFile(v.getContext());
-                SetAlarmManager(alarmTime);
+                WriteFile(v.getContext(), alarmTime);
+//                SetAlarmManager(alarmTime);
 
                 Intent intent = new Intent(v.getContext(), MainActivity.class);
                 v.getContext().startActivity(intent);
@@ -73,7 +76,7 @@ public class ClockDisplay extends AppCompatActivity implements PopupMenu.OnMenuI
         });
     }
 
-    public  void SetAlarmManager(TimePicker timePicker) {
+    public void SetAlarmManager(TimePicker timePicker, int id) {
         Calendar calendar = Calendar.getInstance();
         if (android.os.Build.VERSION.SDK_INT >= 23) {
             calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH),
@@ -85,14 +88,17 @@ public class ClockDisplay extends AppCompatActivity implements PopupMenu.OnMenuI
 
         AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
+
         //creating a new intent specifying the broadcast receiver
         Intent i = new Intent(this, MyAlarm.class);
 
         //creating a pending intent using the intent
-        PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, 0);
+        PendingIntent pi = PendingIntent.getBroadcast(this, id, i, 0);
 
         //setting the repeating alarm that will be fired every day
         am.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pi);
+        alarmManagerMap.put(id, am);
+        pendingIntentMap.put(id, pi);
         Toast.makeText(this, "Alarm is set", Toast.LENGTH_SHORT).show();
     }
 
@@ -179,7 +185,7 @@ public class ClockDisplay extends AppCompatActivity implements PopupMenu.OnMenuI
             }
     }
 
-    void WriteFile(Context context) {
+    void WriteFile(Context context, TimePicker timePicker) {
         String fileInString = ReadFile(context);
         System.out.println(fileInString.toString());
         try {
@@ -191,10 +197,9 @@ public class ClockDisplay extends AppCompatActivity implements PopupMenu.OnMenuI
             e.printStackTrace();
         }
         System.out.println(clocks.toString().length());
-
-
         JSONObject clock1 = new JSONObject();
         try {
+            clock1.put("id", id);
             clock1.put("Hours", myclock.Hours);
             clock1.put("Minutes", myclock.Minites);
             clock1.put("ampm", myclock.AMPM);
@@ -212,7 +217,7 @@ public class ClockDisplay extends AppCompatActivity implements PopupMenu.OnMenuI
             e.printStackTrace();
         }
         try {
-            clocks.put("clock" + id++, clock1);
+            clocks.put("clock" + id, clock1);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -227,6 +232,7 @@ public class ClockDisplay extends AppCompatActivity implements PopupMenu.OnMenuI
         } catch (IOException e) {
             e.printStackTrace();
         }
+        SetAlarmManager(timePicker, id);
 
     }
 
@@ -247,6 +253,31 @@ public class ClockDisplay extends AppCompatActivity implements PopupMenu.OnMenuI
             return null;
         } catch (IOException ioException) {
             return null;
+        }
+    }
+
+    static void DeleteJsonObject(Context context, int id) {
+        String fileInString = ReadFile(context);
+        System.out.println(fileInString.toString());
+        JSONObject json = null;
+        try {
+            json = new JSONObject(fileInString);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        json.remove("clock" + id);
+        System.out.println("DeleteJson: " + json.toString());
+        String jsonStr = json.toString();
+        FileOutputStream fos = null;
+        try {
+            fos = context.openFileOutput("storage.json", Context.MODE_PRIVATE);
+            fos.write(jsonStr.getBytes());
+            fos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
