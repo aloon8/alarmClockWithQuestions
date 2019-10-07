@@ -19,6 +19,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".ClockDisplay"></activity>
+        <receiver
+            android:name=".MyAlarm"
+            android:enabled="true"
+            android:exported="true" />
     </application>
 
 </manifest>

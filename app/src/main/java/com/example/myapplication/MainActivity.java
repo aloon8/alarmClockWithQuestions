@@ -43,7 +43,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     FloatingActionButton fabPlus, fabClock;
     Animation FabOpen, FabClose, FabRClockwisw, FabRanticlockWise;
     boolean isOpen = false;
-    static int id = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,11 +103,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         textview = new TextView(context);
         textview.setLayoutParams(layoutparams);
-        try {
-            textview.setText(object.get("Hours").toString() + ":" + object.get("Minutes").toString());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        textview.setText(GetAlarmTimeString(object));
         textview.setGravity(Gravity.CENTER_HORIZONTAL);
         textview.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 35);
         textview.setTextColor(Color.BLACK);
@@ -147,7 +142,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     
         for (int i = 0; i < json.length(); i++) {
-
             try {
                 JSONObject object = json.getJSONObject("clock" + i);
                 linearLayout.addView(createCardView(object));
@@ -155,7 +149,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 continue;
             }
         }
+    }
 
+    public String GetAlarmTimeString(JSONObject jsonObject){
+        Integer alarmHours   = null;
+        Integer alarmMinites = null;
+        try {
+            alarmHours   = (Integer) jsonObject.get("Hours");
+            alarmMinites = (Integer) jsonObject.get("Minutes");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        String AlarmTimestring;
+        String minutes;
+        if (alarmMinites < 10) {
+            minutes = "0" + alarmMinites.toString();
+        } else {
+            minutes = alarmMinites.toString();
+        }
+        if(alarmHours > 12) {
+            alarmHours = alarmHours - 12;
+            AlarmTimestring = alarmHours.toString().concat(":").concat(minutes).concat(" PM");
+        }
+        else{
+            AlarmTimestring = alarmHours.toString().concat(":").concat(minutes).concat(" AM");
+        }
+        return AlarmTimestring;
 
     }
 

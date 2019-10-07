@@ -1,5 +1,7 @@
 package com.example.myapplication;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.media.Ringtone;
@@ -25,6 +27,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Calendar;
 
 
 public class ClockDisplay extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener {
@@ -62,26 +65,36 @@ public class ClockDisplay extends AppCompatActivity implements PopupMenu.OnMenuI
                 System.out.println("immmm heeererereree");
                 CreateFile(v.getContext());
                 WriteFile(v.getContext());
+                SetAlarmManager(alarmTime);
+
                 Intent intent = new Intent(v.getContext(), MainActivity.class);
                 v.getContext().startActivity(intent);
             }
         });
-
-
-//        Timer t = new Timer();
-//        t.scheduleAtFixedRate(new TimerTask() {
-//            @Override
-//            public void run() {
-//                if(currentTime.getText().toString().equals(AlarmTime())){
-////                    r.play();
-//                    r.stop();
-//                }else{
-//                    r.stop();
-//                }
-//            }
-//        },0,1000);
     }
 
+    public  void SetAlarmManager(TimePicker timePicker) {
+        Calendar calendar = Calendar.getInstance();
+        if (android.os.Build.VERSION.SDK_INT >= 23) {
+            calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH),
+                    timePicker.getHour(), timePicker.getMinute(), 0);
+        } else {
+            calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH),
+                    timePicker.getCurrentHour(), timePicker.getCurrentMinute(), 0);
+        }
+
+        AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+        //creating a new intent specifying the broadcast receiver
+        Intent i = new Intent(this, MyAlarm.class);
+
+        //creating a pending intent using the intent
+        PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, 0);
+
+        //setting the repeating alarm that will be fired every day
+        am.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pi);
+        Toast.makeText(this, "Alarm is set", Toast.LENGTH_SHORT).show();
+    }
 
     public void showPopupDays(View v){
         PopupMenu pop = new PopupMenu(this,v);
@@ -89,12 +102,14 @@ public class ClockDisplay extends AppCompatActivity implements PopupMenu.OnMenuI
         pop.inflate(R.menu.popup_days);
         pop.show();
     }
+
     public void showPopupDifficult(View v){
         PopupMenu pop = new PopupMenu(this,v);
         pop.setOnMenuItemClickListener(this);
         pop.inflate(R.menu.popup_difficult);
         pop.show();
     }
+
     @Override
     public boolean onMenuItemClick(MenuItem item){
         switch (item.getItemId()){
@@ -143,24 +158,6 @@ public class ClockDisplay extends AppCompatActivity implements PopupMenu.OnMenuI
                 return false;
         }
     }
-
-    public String AlarmTime(){
-
-        Integer alarmHours = alarmTime.getCurrentHour();
-        Integer alarmMinites = alarmTime.getCurrentMinute();
-
-        String AlarmTimestring;
-        if(alarmHours > 12) {
-            alarmHours = alarmHours - 12;
-            AlarmTimestring = alarmHours.toString().concat(":").concat(alarmMinites.toString()).concat(" PM");
-        }
-        else{
-            AlarmTimestring = alarmHours.toString().concat(":").concat(alarmMinites.toString()).concat(" AM");
-        }
-        return AlarmTimestring;
-
-    }
-
 
     static void CreateFile(Context context) {
         String filename = "storage.json";
