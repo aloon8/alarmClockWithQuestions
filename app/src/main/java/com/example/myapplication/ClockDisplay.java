@@ -49,7 +49,6 @@ public class ClockDisplay extends AppCompatActivity implements PopupMenu.OnMenuI
         currentTime = findViewById(R.id.TextClock);
         B = findViewById(R.id.button);
         myclock = new ClockA();
-        final Ringtone r = RingtoneManager.getRingtone(getApplicationContext() , RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE));
 
         B.setOnClickListener(new View.OnClickListener() {
             @Override

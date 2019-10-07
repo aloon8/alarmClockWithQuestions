@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//        CreateFile(this);
+        CreateFile(this);
         context = getApplicationContext();
         linearLayout = (LinearLayout)findViewById(R.id.linearLayout);
 
@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void CreateCardViewProgrammatically(){
         String fileInString = ReadFile(context);
-        System.out.println(fileInString.toString());
+//        System.out.println(fileInString.toString());
         JSONObject json = null;
         try {
              json = new JSONObject(fileInString);
