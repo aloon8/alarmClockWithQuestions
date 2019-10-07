@@ -9,6 +9,7 @@ import android.provider.Settings;
 import android.util.Log;
 
 import java.io.Serializable;
+import java.util.Calendar;
 
 /**
  * Created by Belal on 8/29/2017.
@@ -19,7 +20,6 @@ public class MyAlarm extends BroadcastReceiver {
     //the method will be fired when the alarm is triggerred
     @Override
     public void onReceive(Context context, Intent intent) {
-
         Intent intentReg = new Intent();
         intentReg.setClassName("com.example.myapplication","com.example.myapplication.TriviaActivity");
         intentReg.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
