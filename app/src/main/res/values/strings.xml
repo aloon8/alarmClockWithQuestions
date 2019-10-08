@@ -2,4 +2,14 @@
     <string name="app_name">My Application</string>
     <string name="question">question</string>
     <string name="button">Button</string>
+
+    <string-array name="Days">
+        <item>Sunday</item>
+        <item>Monday</item>
+        <item>Tuesday</item>
+        <item>Wednesday</item>
+        <item>Thursday</item>
+        <item>Friday</item>
+        <item>Saturday</item>
+    </string-array>
 </resources>
