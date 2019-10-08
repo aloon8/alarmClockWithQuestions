@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
+import android.support.annotation.RequiresPermission;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -93,7 +94,7 @@ public class ClockDisplay extends AppCompatActivity implements PopupMenu.OnMenuI
         PendingIntent pi = PendingIntent.getBroadcast(this, id, i, 0);
 
         //setting the repeating alarm that will be fired every day
-        am.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pi);
+        am.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pi);
 //        alarmManagerMap.put(id, am);
 //        pendingIntentMap.put(id, pi);
         Toast.makeText(this, "Alarm is set", Toast.LENGTH_SHORT).show();
@@ -279,6 +280,7 @@ public class ClockDisplay extends AppCompatActivity implements PopupMenu.OnMenuI
     }
 
     static void EditJsonObject(Context context, int id) {
+        DeleteJsonObject(context, id);
 
     }
 }

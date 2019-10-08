@@ -233,14 +233,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
+        DeleteJsonObject(context, v.getId());
+        Intent i = new Intent(this, MyAlarm.class);
+        //creating a pending intent using the intent
+        PendingIntent.getBroadcast(this, v.getId(), i, 0).cancel();
+        // do what you want with imageView
         if (v instanceof ImageButton) {
             System.out.println("id: " + v.getId());
-            DeleteJsonObject(context, v.getId());
             linearLayout.removeView(findViewById(v.getId()));
-            Intent i = new Intent(this, MyAlarm.class);
-            //creating a pending intent using the intent
-            PendingIntent.getBroadcast(this, v.getId(), i, 0).cancel();
-            // do what you want with imageView
+        } else if (v instanceof CardView) {
+            linearLayout.removeView(findViewById(v.getId()));
+            Intent intent = new Intent(this, ClockDisplay.class);
+            intent.putExtra("id", id++);
+            this.startActivity(intent);
         }
     }
 }
