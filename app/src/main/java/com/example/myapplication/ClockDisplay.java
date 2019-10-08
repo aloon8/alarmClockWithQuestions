@@ -1,8 +1,10 @@
 package com.example.myapplication;
 
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -28,17 +30,24 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.concurrent.FutureTask;
+
+import static com.example.myapplication.ClockDisplay.ReadFile;
 
 
 public class ClockDisplay extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener {
 
     TimePicker alarmTime;
     TextClock  currentTime;
-    Button B,B2;
+    Button B,daysButton;
     ClockA myclock;
     JSONObject clocks;
     int id;
+    String[] listItems;
+    boolean[] checkedItems;
+    ArrayList<Integer> mUserItems = new ArrayList<>();
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -50,15 +59,45 @@ public class ClockDisplay extends AppCompatActivity implements PopupMenu.OnMenuI
         alarmTime = findViewById(R.id.TimePicker);
         currentTime = findViewById(R.id.TextClock);
         B = findViewById(R.id.button);
-//        B2 = findViewById(R.id.button2);
+
+        //Days list view
+        listItems = getResources().getStringArray(R.array.Days);
+        checkedItems = new boolean[listItems.length];
+        daysButton = findViewById(R.id.daysButton);
+        daysButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder mBuilder = new AlertDialog.Builder(ClockDisplay.this);
+                mBuilder.setTitle("Days Picker");
+                mBuilder.setMultiChoiceItems(listItems, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int position, boolean isChecked) {
+                        if (isChecked) {
+                            if (!mUserItems.contains(position)) {
+                                mUserItems.add(position);
+                            }
+
+                        } else if (mUserItems.contains(position)) {
+                            mUserItems.remove((Object) position);
+                        }
+                    }
+                });
+                mBuilder.setCancelable(false);
+                mBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int which) {
+                        myclock.Days.clear();
+                        for (int i = 0; i < mUserItems.size(); i++) {
+                            myclock.setDays(listItems[mUserItems.get(i)].substring(0,3));
+                        }
+                    }
+                });
+                AlertDialog mDialog = mBuilder.create();
+                mDialog.show();
+            }
+        });
+
         myclock = new ClockA();
-//        B2.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                DaysDialog d = new DaysDialog();
-//                d.getShowsDialog();
-//            }
-//        });
         B.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -73,7 +112,6 @@ public class ClockDisplay extends AppCompatActivity implements PopupMenu.OnMenuI
                 System.out.println("immmm heeererereree");
                 CreateFile(v.getContext());
                 WriteFile(v.getContext(), alarmTime);
-//                SetAlarmManager(alarmTime);
 
                 Intent intent = new Intent(v.getContext(), MainActivity.class);
                 v.getContext().startActivity(intent);
@@ -81,7 +119,7 @@ public class ClockDisplay extends AppCompatActivity implements PopupMenu.OnMenuI
         });
     }
 
-    public void SetAlarmManager(TimePicker timePicker, int id) {
+    public void SetAlarmManager(Context context, TimePicker timePicker, int id) {
         Calendar calendar = Calendar.getInstance();
         if (android.os.Build.VERSION.SDK_INT >= 23) {
             calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH),
@@ -94,16 +132,28 @@ public class ClockDisplay extends AppCompatActivity implements PopupMenu.OnMenuI
         AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
 
+        String fileInString = ReadFile(context);
+        JSONObject json = null;
+        JSONObject object = null;
+        String difficult = "";
+        try {
+            json = new JSONObject(fileInString);
+            object = json.getJSONObject("clock" + id);
+            difficult = (String) object.get("Difficult");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
         //creating a new intent specifying the broadcast receiver
         Intent i = new Intent(this, MyAlarm.class);
+        i.putExtra("Difficult", difficult);
 
         //creating a pending intent using the intent
         PendingIntent pi = PendingIntent.getBroadcast(this, id, i, 0);
 
         //setting the repeating alarm that will be fired every day
         am.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pi);
-//        alarmManagerMap.put(id, am);
-//        pendingIntentMap.put(id, pi);
+
         Toast.makeText(this, "Alarm is set", Toast.LENGTH_SHORT).show();
     }
 
@@ -124,34 +174,6 @@ public class ClockDisplay extends AppCompatActivity implements PopupMenu.OnMenuI
     @Override
     public boolean onMenuItemClick(MenuItem item){
         switch (item.getItemId()){
-            case R.id.sunday:
-                Toast.makeText(this,"Sunday",Toast.LENGTH_SHORT).show();
-                myclock.setDays("Sun");
-                return true;
-            case R.id.monday:
-                Toast.makeText(this,"Monday",Toast.LENGTH_SHORT).show();
-                myclock.setDays("Mon");
-                return true;
-            case R.id.tuesday:
-                Toast.makeText(this,"Tuesday",Toast.LENGTH_SHORT).show();
-                myclock.setDays("Tue");
-                return true;
-            case R.id.wednesday:
-                Toast.makeText(this,"Wednesday",Toast.LENGTH_SHORT).show();
-                myclock.setDays("Wed");
-                return true;
-            case R.id.thursday:
-                Toast.makeText(this,"Thursday",Toast.LENGTH_SHORT).show();
-                myclock.setDays("Thu");
-                return true;
-            case R.id.friday:
-                Toast.makeText(this,"Friday",Toast.LENGTH_SHORT).show();
-                myclock.setDays("Fri");
-                return true;
-            case R.id.saturday:
-                Toast.makeText(this,"Saturday",Toast.LENGTH_SHORT).show();
-                myclock.setDays("Sat");
-                return true;
             case R.id.easy:
                 Toast.makeText(this,"Easy",Toast.LENGTH_SHORT).show();
                 myclock.Difficult = "easy";
@@ -209,8 +231,6 @@ public class ClockDisplay extends AppCompatActivity implements PopupMenu.OnMenuI
             clock1.put("Minutes", myclock.Minites);
             clock1.put("ampm", myclock.AMPM);
             clock1.put("Difficult", myclock.Difficult);
-            JSONArray myJSONArray = new JSONArray();
-            JSONObject obj = new JSONObject();
             JSONArray array = new JSONArray();
             for (String day:myclock.Days) {
                 array.put(day);
@@ -237,7 +257,7 @@ public class ClockDisplay extends AppCompatActivity implements PopupMenu.OnMenuI
         } catch (IOException e) {
             e.printStackTrace();
         }
-        SetAlarmManager(timePicker, id);
+        SetAlarmManager(context, timePicker, id);
 
     }
 

@@ -32,7 +32,9 @@ public class TriviaActivity extends AppCompatActivity implements View.OnClickLis
         setContentView(R.layout.activity_trivia);
         mediaPlayer = MediaPlayer.create(this, Settings.System.DEFAULT_RINGTONE_URI);
         mediaPlayer.start();
-        questions = new Questions(NumOfQues);
+        Intent intent = getIntent();
+        String difficult = intent.getStringExtra("Difficult");
+        questions = new Questions(NumOfQues, difficult);
 
         try {
             questions.execute().get();

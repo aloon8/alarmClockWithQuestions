@@ -10,7 +10,7 @@ public class ClockA implements Serializable {
     Integer Minites;
     String AMPM;
     ArrayList<String> Days = new ArrayList<String>();
-    String Difficult;
+    String Difficult = "Any";
 
     public Integer getHours(){
         return this.Hours;

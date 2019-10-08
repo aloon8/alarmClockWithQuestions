@@ -48,7 +48,7 @@
         android:text="ADD" />
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/daysButton"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
@@ -58,7 +58,6 @@
         android:layout_marginLeft="10dp"
         android:layout_marginEnd="51dp"
         android:layout_marginBottom="103dp"
-        android:onClick="showPopupDays"
         android:background="@drawable/btn_rounded"
         android:text="Days" />
 
@@ -66,7 +65,7 @@
         android:id="@+id/button3"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/button2"
+        android:layout_above="@+id/daysButton"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_gravity="center_vertical|center_horizontal"

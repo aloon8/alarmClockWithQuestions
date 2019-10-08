@@ -23,14 +23,10 @@ public class MyAlarm extends BroadcastReceiver {
         Intent intentReg = new Intent();
         intentReg.setClassName("com.example.myapplication","com.example.myapplication.TriviaActivity");
         intentReg.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        System.out.println("Put extra: " + intent.getStringExtra("Difficult"));
+        intentReg.putExtra("Difficult", intent.getStringExtra("Difficult"));
 //        intentReg.putExtra("MyClass", (Serializable) context);
         context.startActivity(intentReg);
-
-        //you can check the log that it is fired
-        //Here we are actually not doing anything
-        //but you can do any task here that you want to be done at a specific time everyday
-        System.out.println("aaaaaaaaaaaaaaaaaaa");
-        Log.d("MyAlarmBelal", "Alarm just fired");
     }
 
 }

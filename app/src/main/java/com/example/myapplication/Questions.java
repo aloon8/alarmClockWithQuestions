@@ -20,10 +20,12 @@ import java.util.Random;
 public class Questions extends AsyncTask<Void,Void,Void> {
     public Question[] questions;
     int quesNum;
+    String difficult;
 
-    public Questions(int ques_num) {
+    public Questions(int ques_num, String difficult) {
         super();
         quesNum = ques_num;
+        this.difficult = difficult;
     }
 
     @Override
@@ -38,7 +40,12 @@ public class Questions extends AsyncTask<Void,Void,Void> {
     @Override
     protected Void doInBackground(Void... voids) {
         questions = new Question[quesNum];
-        String strUrl = "https://opentdb.com/api.php?amount="+String.valueOf(10)+"&type=multiple";
+        String strUrl = "https://opentdb.com/api.php?amount=" + String.valueOf(10);
+        if (!difficult.equals("Any")) {
+            strUrl += "&difficulty=" + difficult;
+        }
+        strUrl += "&type=multiple";
+        System.out.println("URL: " + strUrl);
         try {
             URL url = new URL(strUrl);
             HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();

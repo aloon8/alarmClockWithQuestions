@@ -1,39 +1,29 @@
 package com.example.myapplication;
 
-import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
-import android.text.Layout;
-import android.util.JsonReader;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import static com.example.myapplication.ClockDisplay.CreateFile;
 import static com.example.myapplication.ClockDisplay.DeleteJsonObject;
@@ -124,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         buttonLayoutParams.leftMargin = 920;
         buttonLayoutParams.topMargin = 10;
         layoutparams = new LayoutParams(LayoutParams.MATCH_PARENT ,400);
-        layoutparams.topMargin = 50;
+        layoutparams.topMargin = 10;
         layoutparams.leftMargin = 20;
         layoutparams.rightMargin = 20;
         cardview.setLayoutParams(layoutparams);
@@ -147,6 +137,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        imgButton.setBackgroundColor(Color.TRANSPARENT);
         imgButton.setOnClickListener(this);
         cardview.addView(imgButton);
         textview = new TextView(context);
@@ -158,17 +149,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         cardview.addView(textview);
         TextView textview1 = new TextView(context);
         layoutparams1 = new LayoutParams(LayoutParams.MATCH_PARENT ,400);
-        layoutparams1.topMargin = 200;
+        layoutparams1.topMargin = 160;
         textview1.setLayoutParams(layoutparams1);
 
         try {
             JSONArray DaysArray = object.getJSONArray("key");
-            if (DaysArray.length() == 0) {
+            if (DaysArray.length() == 0 || DaysArray.length() == 7) {
                 textview1.append("Every Day");
-            }
-            for (int i = 0; i < DaysArray.length(); i++ ) {
-                Object day = DaysArray.get(i);
-                textview1.append(day.toString() + " ");
+            } else {
+                for (int i = 0; i < DaysArray.length(); i++) {
+                    Object day = DaysArray.get(i);
+                    textview1.append(day.toString() + " ");
+                }
             }
 
         } catch (JSONException e) {
@@ -178,7 +170,45 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         textview1.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 25);
         textview1.setTextColor(Color.BLACK);
         cardview.addView(textview1);
+
+        //Difficult
+        LinearLayout linearLayout = new LinearLayout(context);
+        linearLayout.setOrientation(LinearLayout.HORIZONTAL);
+        LayoutParams difficultLayout = new LayoutParams(LayoutParams.MATCH_PARENT ,100);
+        difficultLayout.topMargin = 290;
+        linearLayout.setLayoutParams(difficultLayout);
+        String difficultStr = "";
+        try {
+            difficultStr = (String) object.get("Difficult");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        ImageView[] imageViews;
+        if (difficultStr.equals("Any")) {
+            imageViews = new ImageView[3];
+            imageViews[0] = SetImageView(context, "easy");
+            imageViews[1] = SetImageView(context, "medium");
+            imageViews[2] = SetImageView(context, "hard");
+        } else {
+            imageViews = new ImageView[1];
+            imageViews[0] = SetImageView(context, difficultStr);
+        }
+
+        linearLayout.setGravity(Gravity.CENTER_HORIZONTAL);
+        for (int i = 0; i < imageViews.length; i++) {
+            linearLayout.addView(imageViews[i]);
+        }
+        cardview.addView(linearLayout);
         return  cardview;
+    }
+
+    public ImageView SetImageView(Context context, String difficult) {
+        ImageView imageView = new ImageView(context);
+        if (difficult.equals("easy")) imageView.setImageResource(R.drawable.easy_icon);
+        else if (difficult.equals("medium")) imageView.setImageResource(R.drawable.medium_icon);
+        else if (difficult.equals("hard")) imageView.setImageResource(R.drawable.hard_icon);
+        imageView.setBackgroundColor(Color.TRANSPARENT);
+        return imageView;
     }
 
     public void CreateCardViewProgrammatically(){
